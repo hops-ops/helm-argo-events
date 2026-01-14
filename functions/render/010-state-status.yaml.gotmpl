@@ -1,0 +1,23 @@
+# code: language=yaml
+#
+# Compute status values from observed state
+#
+
+{{- $a := $state.argoevents }}
+{{- $obs := $state.observed }}
+
+# ==============================================================================
+# Compute status output
+# ==============================================================================
+
+{{- $helmReady := $obs.helmRelease.ready | default false }}
+{{- $ready := $helmReady }}
+
+{{- $state = set $state "status" (dict
+  "ready" $ready
+  "release" (dict
+    "name" $a.releaseName
+    "namespace" $a.namespace
+    "ready" $helmReady
+  )
+) }}

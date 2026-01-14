@@ -1,0 +1,50 @@
+# code: language=yaml
+#
+# Helm release for Argo Events - event-driven workflow automation
+#
+# Defaults:
+# - Installs CRDs
+# - Enables controller
+# - Note: EventBus must be created separately after installation
+#
+
+{{- $a := $state.argoevents }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $a.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-argo-events" }}
+  labels: {{ $a.labels | toJson }}
+spec:
+  managementPolicies: {{ $a.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: argo-events
+      repository: https://argoproj.github.io/argo-helm
+      version: 2.4.19
+    namespace: {{ $a.namespace }}
+    {{- if $a.overrideAllValues }}
+    values:
+      {{- toYaml $a.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: argo-events
+      nameOverride: argo-events
+      # Install CRDs
+      crds:
+        install: true
+        keep: true
+      # Controller configuration
+      controller:
+        replicas: 1
+      {{- if $a.values }}
+      {{- toYaml $a.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $a.providerConfigRef.name }}
+    kind: {{ $a.providerConfigRef.kind }}

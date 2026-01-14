@@ -1,0 +1,85 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: argoevents.helm.hops.ops.com.ai
+spec:
+  group: helm.hops.ops.com.ai
+  names:
+    kind: ArgoEvents
+    plural: argoevents
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    referenceable: true
+    served: true
+    schema:
+      openAPIV3Schema:
+        description: ArgoEvents installs the Argo Events Helm chart for event-driven workflow automation.
+        type: object
+        properties:
+          spec:
+            description: ArgoEventsSpec defines the desired state of ArgoEvents.
+            type: object
+            properties:
+              clusterName:
+                description: Name of the target cluster. Used as default for provider config names.
+                type: string
+              managementPolicies:
+                description: Management policies for all composed resources. Defaults to ["*"].
+                type: array
+                items:
+                  type: string
+                default:
+                - "*"
+              labels:
+                description: Custom labels applied to all managed resources. Merged with default labels (hops.ops.com.ai/managed, hops.ops.com.ai/argoevents).
+                type: object
+                additionalProperties:
+                  type: string
+                x-kubernetes-preserve-unknown-fields: true
+              providerConfigRef:
+                description: Reference to the Helm ProviderConfig.
+                type: object
+                properties:
+                  name:
+                    description: Name of the ProviderConfig. Defaults to clusterName.
+                    type: string
+                  kind:
+                    description: Kind of the ProviderConfig. Defaults to ProviderConfig.
+                    type: string
+                    enum:
+                    - ProviderConfig
+                    - ClusterProviderConfig
+              namespace:
+                description: Namespace for the Helm release. Defaults to argo-events.
+                type: string
+              name:
+                description: Helm release name. Defaults to the XR metadata.name.
+                type: string
+              values:
+                description: Helm values merged with defaults (controller, CRDs).
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              overrideAllValues:
+                description: Helm values that replace all defaults.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: ArgoEventsStatus defines the observed state of ArgoEvents.
+            type: object
+            properties:
+              ready:
+                description: Overall readiness of the ArgoEvents installation.
+                type: boolean
+              release:
+                description: Status of the Helm release.
+                type: object
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  ready:
+                    type: boolean
+        required:
+        - spec

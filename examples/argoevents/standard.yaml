@@ -1,0 +1,29 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: ArgoEvents
+metadata:
+  name: argo-events
+  namespace: default
+spec:
+  clusterName: production-cluster
+  namespace: argo-events
+  labels:
+    team: platform
+    environment: production
+  providerConfigRef:
+    name: production-cluster
+    kind: ProviderConfig
+  values:
+    # Controller configuration
+    controller:
+      replicas: 2
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+    # Service account
+    serviceAccount:
+      create: true
+      name: argo-events-sa

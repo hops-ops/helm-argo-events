@@ -1,0 +1,7 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: ArgoEvents
+metadata:
+  name: argo-events
+  namespace: default
+spec:
+  clusterName: my-cluster
