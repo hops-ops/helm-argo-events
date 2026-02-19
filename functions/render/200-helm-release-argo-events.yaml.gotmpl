@@ -31,8 +31,6 @@ spec:
       {{- toYaml $a.overrideAllValues | nindent 6 }}
     {{- else }}
     values:
-      fullnameOverride: argo-events
-      nameOverride: argo-events
       # Install CRDs
       crds:
         install: true
